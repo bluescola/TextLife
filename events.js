@@ -54,6 +54,175 @@ const GameEvents = {
                 charm: -10
             }
         },
+        {
+            id: 'baby_n3',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你学会了爬。爬到客厅时,你看到桌上有个红色按钮。',
+            result: '你按了下去。那是你爸的游戏手柄,正在打BOSS的他当场去世。他看着你,又看看屏幕上的"YOU DIED",陷入了沉思。',
+
+            death: {
+                chance: 0.06,
+                reason: '你爸一怒之下把手柄扔向你。手柄精准命中你的太阳穴。'
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                intelligence: +8,
+                luck: -15
+            }
+        },
+        {
+            id: 'baby_n4',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            text: '你第一次吃辅食。妈妈喂你胡萝卜泥。',
+            result: '你吐了她一脸。妈妈愣住了,然后笑着说:"没事没事。"转身去洗脸时,你听到她在卫生间哭。爸爸说:"孩子还小,你别往心里去。"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                health: -5,
+                charm: -8
+            }
+        },
+        {
+            id: 'baby_n5',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'high',
+            category: 'family',
+
+            text: '你第一次去动物园。看到猴子时你很兴奋,一直指着叫。',
+            result: '猴子突然扔了一泡屎过来,正中你的脸。你妈尖叫着抱你去洗。路人都在笑。导游说:"这猴子今年已经扔中37个小孩了,您家孩子是第38个。"',
+
+            death: {
+                chance: 0.12,
+                reason: '猴子粪便含有致命病菌。你在三天后因感染去世。'
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                luck: -20,
+                health: -10,
+                charm: -15
+            }
+        },
+        {
+            id: 'baby_n6',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            text: '你在小区里玩。一个阿姨说你长得真可爱。',
+            result: '然后她掏出手机:"我给你拍张照片吧!"拍完后她皱着眉头看了看手机,默默删掉了照片,说:"可能是光线不好。"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                charm: -12,
+                intelligence: +5
+            }
+        },
+        {
+            id: 'baby_n7',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '幼儿园午睡时间。你睡不着,盯着天花板看。',
+            result: '突然,天花板上的吊扇掉了下来。好在它掉在你旁边的床上,那个小朋友刚好去上厕所了。老师说你命大。',
+
+            death: {
+                chance: 0.25,
+                reason: '吊扇砸中了你的头。监控显示,吊扇掉落前转了整整三圈,像是在瞄准。'
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                luck: +20,
+                health: +5
+            }
+        },
+        {
+            id: 'baby_n8',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            text: '你第一次见到电视。屏幕里的人在动,你觉得很神奇。',
+            result: '你爬过去,用力拍了一下屏幕。电视"啪"的一声黑了。爸爸正在看球赛直播,进球的瞬间。他呆呆地看着你,一句话也说不出来。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                intelligence: +10,
+                luck: -25
+            }
+        },
+        {
+            id: 'baby_n9',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'high',
+            category: 'family',
+
+            text: '你学会了叫"妈妈"。但第一次叫的时候,你指着保姆阿姨。',
+            result: '你妈脸都绿了。保姨尴尬地笑着说:"小孩子不懂事。"你妈当天就把保姆辞退了。之后每次她喂你吃饭,都会反复问:"我是谁?"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                intelligence: -5,
+                charm: -15
+            }
+        },
+        {
+            id: 'baby_n10',
+            type: 'narrative',
+            ageGroup: 'baby',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你第一次坐飞机。起飞时气压变化,你耳朵疼,开始大哭。',
+            result: '你哭了整整2个小时。全舱的人都用杀人的眼神看着你爸妈。下飞机时,有个大叔经过你们,冷冷地说:"建议以后别带孩子坐飞机。"你妈当场哭了。',
+
+            death: {
+                chance: 0.08,
+                reason: '气压导致你耳膜破裂,引发脑出血。降落时你已经没了呼吸。'
+            },
+
+            ageJump: { min: 5, max: 8 },
+            attributes: {
+                health: -15,
+                charm: -20
+            }
+        },
 
         // ========== 儿童期（7-12岁）==========
         {
@@ -98,6 +267,179 @@ const GameEvents = {
                 luck: +10
             }
         },
+        {
+            id: 'child_n3',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '体育课跑步比赛。你全力冲刺,终于第一个冲过终点。',
+            result: '结果老师说你抢跑,成绩无效。监控回放显示你确实早跑了0.1秒。全班都在笑,你气得哭了。老师说:"体育精神最重要。"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                health: -10,
+                charm: -15,
+                intelligence: +5
+            }
+        },
+        {
+            id: 'child_n4',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '冬天,你舔了一下金属栏杆。舌头粘住了。',
+            result: '你慌了,用力拉。撕拉一声,舌头破了一大块皮。血流不止。路人围观,有人拍照。你成了当天的朋友圈热点。',
+
+            death: {
+                chance: 0.15,
+                reason: '失血过多加上冻伤感染。三天后因败血症去世。'
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                health: -20,
+                intelligence: -15,
+                charm: -10
+            }
+        },
+        {
+            id: 'child_n5',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'medium',
+            category: 'school',
+
+            text: '课间,你去厕所。蹲坑时听见外面有人叫你名字。',
+            result: '你着急提裤子,结果脚一滑,整个人掉进了坑里。清洁工把你捞出来时,全校都传开了。从此你有了外号"粪坑侠"。',
+
+            death: {
+                chance: 0.20,
+                reason: '掉入粪坑淹死。死状极其难看。'
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                charm: -30,
+                luck: -25,
+                health: -15
+            }
+        },
+        {
+            id: 'child_n6',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你捡到一张100元。正准备交给老师。',
+            result: '一个高年级学生拦住你,说钱是他的。你不信,他就打了你一拳。你哭着给了他。回家后你爸说:"为什么不反抗?"你说不过他。你爸叹了口气:"唉。"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                luck: -15,
+                charm: -10,
+                intelligence: +10
+            }
+        },
+        {
+            id: 'child_n7',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '美术课,老师让画"我的家"。你很认真地画了。',
+            result: '老师看了你的画,问:"为什么你爸爸比房子还大?"你说:"因为爸爸很重要。"老师说:"这是透视问题,不是感情问题。"全班笑了。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                intelligence: -10,
+                charm: -8
+            }
+        },
+        {
+            id: 'child_n8',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '放学路上,天空突然下起了暴雨。你没带伞。',
+            result: '你顶着书包往家跑。路过一栋楼时,楼上掉下来一个花盆,砸在你刚才站的位置。你吓得腿软,坐在水坑里哭。',
+
+            death: {
+                chance: 0.30,
+                reason: '花盆砸中你的头。死因:天降花盆。'
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                luck: +25,
+                health: +5
+            }
+        },
+        {
+            id: 'child_n9',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'medium',
+            category: 'school',
+
+            text: '老师让每个人说一个优点。轮到你时,你想了很久。',
+            result: '最后你说:"我没有优点,但我知道自己没有优点,这算吗?"全班先是沉默,然后爆笑。老师说:"这…也算一种自知之明吧。"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                intelligence: +15,
+                charm: -20
+            }
+        },
+        {
+            id: 'child_n10',
+            type: 'narrative',
+            ageGroup: 'child',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你第一次自己泡方便面。看说明写着"加开水静置3分钟"。',
+            result: '你忘了加水,直接放进微波炉。3分钟后,微波炉里着火了。消防车来了,你们家被烧了个精光。你爸看着废墟,久久无言。',
+
+            death: {
+                chance: 0.25,
+                reason: '大火中被浓烟呛死。死前你闻到了泡面的香味。'
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                intelligence: -20,
+                luck: -30,
+                health: -15
+            }
+        },
 
         // ========== 青少年期（13-18岁）==========
         {
@@ -140,6 +482,200 @@ const GameEvents = {
             attributes: {
                 intelligence: -10,
                 luck: -5
+            }
+        },
+        {
+            id: 'teen_n2',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '体育课1000米测试。你拼尽全力跑完,瘫在地上。',
+            result: '这时你暗恋的人路过,问:"你还好吗?"你想站起来装没事,结果腿一软,脸朝下摔在地上。鼻血喷了一地。Ta吓得跑开了。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                charm: -20,
+                health: -10
+            }
+        },
+        {
+            id: 'teen_n3',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你感冒了,忍不住要打喷嚏。上课时你硬憋着。',
+            result: '结果憋得太用力,鼻血喷了出来。更糟的是,你忍喷嚏时发出了奇怪的声音,全班都转头看你。老师问:"要不要去医务室?"你说不用,然后晕了过去。',
+
+            death: {
+                chance: 0.10,
+                reason: '硬憋喷嚏导致血管爆裂,脑出血当场死亡。'
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                health: -15,
+                charm: -18,
+                intelligence: -10
+            }
+        },
+        {
+            id: 'teen_n4',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'medium',
+            category: 'school',
+
+            text: '班里要选文艺委员。你觉得自己唱歌还行,想试试。',
+            result: '你站起来清了清嗓子,开始唱。唱了一句后,全班陷入了死一般的寂静。然后有人笑了,接着全班都笑了。班主任说:"呃...我们再看看别人。"',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                charm: -25,
+                intelligence: +5
+            }
+        },
+        {
+            id: 'teen_n5',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你第一次去网吧。坐下来准备玩游戏。',
+            result: '网管走过来:"同学,未成年不能进网吧。"你说你满18了。网管让你拿身份证,你掏了半天,发现没带。网管直接叫了你爸妈。你爸到了之后一句话没说,只是看着你。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                luck: -15,
+                intelligence: -10,
+                charm: -5
+            }
+        },
+        {
+            id: 'teen_n6',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '考试时你憋尿憋得难受。终于熬到交卷,你冲向厕所。',
+            result: '结果厕所人太多,你等不及了,直接尿裤子了。尿顺着裤腿流了一地。后面排队的同学都看到了。第二天全校都知道了。',
+
+            death: {
+                chance: 0.05,
+                reason: '羞愧难当,当晚从楼上跳了下去。'
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                charm: -35,
+                health: -5
+            }
+        },
+        {
+            id: 'teen_n7',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            text: '你在公交车上站着。突然司机一个急刹车。',
+            result: '你没站稳,整个人扑到了前面一个女生身上。女生尖叫,周围的人都用谴责的眼神看你。你解释说是急刹车,但没人信。那女生男朋友上来就是一拳。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                luck: -20,
+                health: -15,
+                charm: -15
+            }
+        },
+        {
+            id: 'teen_n8',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '数学课老师点你回答问题。你根本没听课,完全不会。',
+            result: '你站起来说:"老师,我不会。"老师说:"那你上课在干嘛?"你如实回答:"在睡觉。"全班笑了,老师的脸都绿了。你被罚站了一整节课。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                intelligence: -8,
+                charm: +5
+            }
+        },
+        {
+            id: 'teen_n9',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你在超市偷偷打开了一包薯片,想尝尝味道。',
+            result: '结果被保安抓住了。保安说要叫警察。你吓得哭了,说你没钱。保安看你可怜,让你把薯片买下来。你掏出身上仅有的5块钱,薯片要8块。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                luck: -20,
+                charm: -15,
+                intelligence: -10
+            }
+        },
+        {
+            id: 'teen_n10',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '班上流行玩笔,你也想学。下课时你疯狂转笔。',
+            result: '笔突然脱手飞了出去,正中前排女生的后脑勺。女生尖叫,转头怒视你。更糟的是,笔上的墨水炸了,把女生的白衬衫染了一大片。女生哭了,班主任叫了你家长。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                charm: -25,
+                luck: -20,
+                intelligence: -5
             }
         },
 

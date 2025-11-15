@@ -380,16 +380,31 @@ class TextLifeGame {
         return this.selectEventByWeight(candidates);
     }
 
-    // 记录事件到去重列表
+    // 记录事件到去重列表(动态窗口)
     recordEvent(eventId, isNarrative) {
+        const ageGroup = GameConfig.getAgeGroup(this.character.age);
+        const allEvents = isNarrative ? GameEvents.narrativeEvents : GameEvents.choiceEvents;
+
+        // 计算当前年龄段的事件池大小
+        const ageGroupEventCount = allEvents.filter(e => e.ageGroup === ageGroup).length;
+
+        // 动态去重窗口 = min(配置值, 事件池大小 - 1)
+        // 确保窗口不会超过事件池,否则无法筛选
+        const configLimit = isNarrative
+            ? GameConfig.eventSystem.deduplication.narrativeEvents
+            : GameConfig.eventSystem.deduplication.choiceEvents;
+        const dynamicLimit = Math.min(configLimit, Math.max(1, ageGroupEventCount - 1));
+
+        console.log(`[动态去重] 年龄段:${ageGroup}, 事件池:${ageGroupEventCount}, 配置窗口:${configLimit}, 实际窗口:${dynamicLimit}`);
+
         if (isNarrative) {
             this.recentNarrativeEvents.push(eventId);
-            if (this.recentNarrativeEvents.length > GameConfig.eventSystem.deduplication.narrativeEvents) {
+            if (this.recentNarrativeEvents.length > dynamicLimit) {
                 this.recentNarrativeEvents.shift();
             }
         } else {
             this.recentChoiceEvents.push(eventId);
-            if (this.recentChoiceEvents.length > GameConfig.eventSystem.deduplication.choiceEvents) {
+            if (this.recentChoiceEvents.length > dynamicLimit) {
                 this.recentChoiceEvents.shift();
             }
         }
