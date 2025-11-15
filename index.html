@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEXT LIFE - 文字人生</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="terminal">
+        <div id="header">
+            <div class="ascii-art">
+ _____ _______  _________   _     ___ _____ _____
+|_   _| ____\ \/ /_   _\ \ | |   |_ _|  ___| ____|
+  | | |  _|  \  /  | |  \  \| |    | || |_  |  _|
+  | | | |___ /  \  | |   |\  |    | ||  _| | |___
+  |_| |_____/_/\_\ |_|   |_\_|___|___|_|   |_____|
+
+            </div>
+            <div class="subtitle">█ 文字人生 v1.0.0 █ 你能活多久？█</div>
+        </div>
+
+        <div id="game-container">
+            <div id="output"></div>
+            <div id="choices"></div>
+        </div>
+
+        <div id="stats-bar">
+            <span id="age">年龄: 0</span>
+            <span id="health">健康: 100</span>
+            <span id="intelligence">智力: 100</span>
+            <span id="luck">运气: 100</span>
+            <span id="charm">魅力: 100</span>
+        </div>
+
+        <div id="highscores">
+            <div class="highscore-title">█ 历史记录 TOP 3 █</div>
+            <div id="highscore-list"></div>
+        </div>
+    </div>
+
+    <script src="particles.js"></script>
+    <script src="config.js"></script>
+    <script src="events.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
