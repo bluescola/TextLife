@@ -172,8 +172,13 @@ const GameEvents = {
             attractiveness: 'medium',
             category: 'love',
 
+            // 前置条件: 无伴侣才会相亲
+            prerequisites: {
+                hasPartner: false
+            },
+
             text: '相亲对象问你有房吗？你说没有。问你有车吗？你说没有。问你有存款吗？你说...',
-            result: '对方的手机突然响了。她说"不好意思我妈找我有急事"，然后消失在了茫茫人海中。',
+            result: '对方的手机突然响了。她说"不好意思我妈找我有急事",然后消失在了茫茫人海中。',
 
             death: {
                 chance: 0,
@@ -193,8 +198,8 @@ const GameEvents = {
             attractiveness: 'high',
             category: 'money',
 
-            text: '你在路边捡到一张彩票。回家一查，中了5000元！你激动地整夜失眠。',
-            result: '第二天早上醒来发现彩票不见了。你怀疑是被风吹走了，但更怀疑自己根本没捡到过。',
+            text: '你在路边捡到一张彩票。回家一查,中了5000元!你激动地发朋友圈"财富密码找到了",整夜失眠。',
+            result: '第二天早上醒来发现彩票不见了。你翻遍了整个房间。你怀疑是被风吹走了,但更怀疑自己做了个梦。朋友圈还在,彩票没了。你赶紧删了朋友圈。',
 
             death: {
                 chance: 0.09,
@@ -216,8 +221,14 @@ const GameEvents = {
             attractiveness: 'medium',
             category: 'family',
 
-            text: '你儿子问："爸，什么是梦想？"你想起自己年轻时也有过梦想。',
-            result: '但现在你只想着房贷车贷和下个月的绩效。你说："梦想就是...好好学习。"',
+            // 前置条件: 必须有孩子,且孩子是青少年(13-18岁)才会问这种哲学问题
+            prerequisites: {
+                hasChild: true,
+                childAgeRange: [13, 18]
+            },
+
+            text: '孩子突然问你:"什么是梦想？"你想起自己年轻时想当科学家。',
+            result: '你看了看手里的外卖订单,说:"梦想就是...好好学习,找个好工作。"孩子翻了个白眼:"你这是PUA我。"然后继续刷抖音。你不知道PUA是什么意思。',
 
             death: {
                 chance: 0,
@@ -237,8 +248,8 @@ const GameEvents = {
             attractiveness: 'low',
             category: 'daily',
 
-            text: '体检报告出来了。医生指着一堆箭头说："你这个高，那个低，这个也不太好..."',
-            result: '你点点头表示知道了。出门后直奔烧烤摊，点了一堆啤酒和烤串。',
+            text: '体检报告出来了。医生指着一堆向上的箭头说:"血压高、血脂高、血糖高、尿酸高..."',
+            result: '你说:"医生,我这是四高成就达成了吗？"医生没笑。你点点头表示知道了,出门后直奔烧烤摊,发朋友圈:"人生得意须尽欢"配图烤串和啤酒。',
 
             death: {
                 chance: 0.13,
@@ -260,12 +271,12 @@ const GameEvents = {
             attractiveness: 'low',
             category: 'daily',
 
-            text: '你在公园下棋。一群老头围观，纷纷指点："这步不对！""应该走那边！"',
-            result: '你说："那你来下！"他们都说："我不会下，但我看得出你下错了。"',
+            text: '你在公园下棋。一群老头围观,纷纷指点:"这步不对!""应该走那边!""你怎么这么菜!"',
+            result: '你说:"那你来下!"他们都说:"我不会下,但我看得出你下错了。"你气得把棋盘掀了。有人拿出手机拍视频,说要发抖音。你追着他跑了两条街。',
 
             death: {
                 chance: 0.11,
-                reason: '被气得中风。死前你想说："我*&%#@..."'
+                reason: '追人时心脏病发作。旁观者都在拍视频没人救你。'
             },
 
             ageJump: { min: 5, max: 10 },
@@ -281,12 +292,18 @@ const GameEvents = {
             attractiveness: 'medium',
             category: 'family',
 
-            text: '孙子问你年轻时候的故事。你想了想，决定给他讲一个"美化版"的人生。',
-            result: '讲到激动处，你都快相信自己真的那么厉害了。孙子听得津津有味。',
+            // 前置条件: 必须有孩子,且孩子至少20岁(才可能有孙子)
+            prerequisites: {
+                hasChild: true,
+                childAge: { min: 20 }
+            },
+
+            text: '孙子问你年轻时候的故事。你想了想,决定给他讲一个"美化版"的人生。你说你年轻时也是个"狠人"。',
+            result: '讲到激动处,你都快相信自己真的那么厉害了。孙子听得津津有味,还拍了视频说要发B站。你问B站是什么,孙子说你不懂。',
 
             death: {
                 chance: 0.15,
-                reason: '说到激动处，心脏病发作。但你死得很满足，因为孙子相信了你的故事。'
+                reason: '说到激动处,心脏病发作。但你死得很满足,因为孙子相信了你的故事。'
             },
 
             ageJump: { min: 5, max: 10 },
@@ -537,6 +554,51 @@ const GameEvents = {
                 luck: -10
             }
         },
+        {
+            id: 'teen_n6',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '班级群里有人发了个梗图。大家都在刷"哈哈哈"。你没看懂,但也发了个"哈哈哈"。',
+            result: '结果有人@你问:"你笑什么？"你才发现这个梗是在嘲讽你。全班都知道你装懂。你被群主禁言了一周。',
+
+            death: {
+                chance: 0.03,
+                reason: '羞愧难当,跳楼自杀。'
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                charm: -20,
+                intelligence: -10,
+                luck: -15
+            }
+        },
+        {
+            id: 'teen_n7',
+            type: 'narrative',
+            ageGroup: 'teen',
+            attractiveness: 'high',
+            category: 'school',
+
+            text: '家长会后,你妈回家一言不看。你问:"老师说什么了？"你妈看了你一眼。',
+            result: '你妈说:"老师说你各方面都很好。"你松了口气。然后你妈拿出手机,给你看班级群。老师在群里说:"某某同学成绩下降严重,家长要重视。"某某就是你。',
+
+            death: {
+                chance: 0.08,
+                reason: '你妈当场气晕,你吓得心脏骤停。'
+            },
+
+            ageJump: { min: 1, max: 2 },
+            attributes: {
+                charm: -15,
+                intelligence: -12,
+                health: -10,
+                luck: -15
+            }
+        },
 
         // ========== 新增事件 - 青年期 ==========
         {
@@ -610,8 +672,13 @@ const GameEvents = {
             attractiveness: 'high',
             category: 'love',
 
-            text: '你的朋友们都结婚了。他们问你："什么时候轮到你？"',
-            result: '你笑着说："快了快了。"然后回家打开外卖APP,点了一份单人餐。',
+            // 前置条件: 无伴侣才会被朋友催婚
+            prerequisites: {
+                hasPartner: false
+            },
+
+            text: '你的朋友们都结婚了。他们问你:"什么时候轮到你？"',
+            result: '你笑着说:"快了快了。"然后回家打开外卖APP,点了一份单人餐。',
 
             death: {
                 chance: 0.06,
@@ -623,6 +690,73 @@ const GameEvents = {
                 charm: -10,
                 health: -8,
                 luck: -10
+            }
+        },
+        {
+            id: 'young_n8',
+            type: 'narrative',
+            ageGroup: 'young',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '你妈带你去相亲角。周围都是举着牌子的父母。你妈的牌子写:"独生子女,有车有房,年薪30万。"',
+            result: '你尴尬地站在旁边,看着一群阿姨围过来品头论足。有人说你太矮,有人说你长得一般。你妈急了,开始和别人battle。最后差点打起来。',
+
+            death: {
+                chance: 0.05,
+                reason: '你妈和对方家长打架,你去劝架被误伤致死。'
+            },
+
+            ageJump: { min: 1, max: 3 },
+            attributes: {
+                charm: -15,
+                health: -8,
+                luck: -12
+            }
+        },
+        {
+            id: 'young_n9',
+            type: 'narrative',
+            ageGroup: 'young',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            text: '你点了份外卖。骑手给你打电话:"我在你楼下。"你说:"我在5楼。"骑手说:"送不上去,你下来拿。"',
+            result: '你说外卖不是应该送到门口吗？骑手说他赶时间。你下楼时发现他送错了小区,你的外卖在800米外。你走过去拿,饭已经凉了。',
+
+            death: {
+                chance: 0.03,
+                reason: '过马路取外卖时被车撞死。'
+            },
+
+            ageJump: { min: 1, max: 3 },
+            attributes: {
+                health: -10,
+                charm: -8,
+                luck: -15
+            }
+        },
+        {
+            id: 'young_n10',
+            type: 'narrative',
+            ageGroup: 'young',
+            attractiveness: 'high',
+            category: 'career',
+
+            text: '公司出了问题,需要有人背锅。领导开会时一直盯着你看。',
+            result: '会后,领导把你叫进办公室,说:"这次的事,就说是你的责任吧。我会补偿你的。"一个月后,你被裁员了。领导的补偿从未兑现。',
+
+            death: {
+                chance: 0.08,
+                reason: '你想不开,从公司楼顶跳了下去。'
+            },
+
+            ageJump: { min: 1, max: 3 },
+            attributes: {
+                intelligence: -15,
+                charm: -10,
+                health: -12,
+                luck: -20
             }
         },
 
@@ -655,8 +789,14 @@ const GameEvents = {
             attractiveness: 'medium',
             category: 'family',
 
-            text: '你老婆问你："我们当初为什么结婚？"你想了很久,想不起来了。',
-            result: '你说："因为爱情吧。"她笑了笑,没再说话。你们都知道,那已经是很久以前的事了。',
+            // 前置条件: 有伴侣且在一起至少5年
+            prerequisites: {
+                hasPartner: true,
+                partnerYears: { min: 5 }
+            },
+
+            text: '另一半问你:"我们当初为什么在一起？"你想了很久,想不起来了。',
+            result: '你说:"因为爱情吧。"Ta笑了笑,没再说话。你们都知道,那已经是很久以前的事了。',
 
             death: {
                 chance: 0,
@@ -691,6 +831,84 @@ const GameEvents = {
                 health: -3
             }
         },
+        {
+            id: 'middle_n6',
+            type: 'narrative',
+            ageGroup: 'middle',
+            attractiveness: 'high',
+            category: 'family',
+
+            text: '同学群里有人发了张照片:特斯拉Model S,配文"刚提的车,低调低调"。',
+            result: '群里瞬间炸了。大家纷纷点赞恭喜。你默默退出了聊天界面,看了看自己的电动车。你想发个朋友圈,但想了想还是算了。',
+
+            death: {
+                chance: 0.05,
+                reason: '心理落差太大,抑郁自杀。'
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                charm: -15,
+                health: -10,
+                luck: -12
+            }
+        },
+        {
+            id: 'middle_n7',
+            type: 'narrative',
+            ageGroup: 'middle',
+            attractiveness: 'medium',
+            category: 'family',
+
+            // 前置条件: 有孩子且孩子至少13岁(青少年)
+            prerequisites: {
+                hasChild: true,
+                childAge: { min: 13 }
+            },
+
+            text: '你想和孩子聊聊天。你问Ta学校怎么样,有什么烦恼。',
+            result: '孩子看都不看你,说:"你不懂。"然后戴上耳机。你站在那里,不知道该说什么。你意识到,你们之间已经有了一道墙。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                charm: -12,
+                health: -8,
+                intelligence: -5
+            }
+        },
+        {
+            id: 'middle_n8',
+            type: 'narrative',
+            ageGroup: 'middle',
+            attractiveness: 'high',
+            category: 'family',
+
+            // 前置条件: 有伴侣且有一个孩子
+            prerequisites: {
+                hasPartner: true,
+                hasChild: true
+            },
+
+            text: '你妈打电话来,问你什么时候生二胎。你说工作太忙,压力太大。',
+            result: '你妈说:"别人都生了,你怎么这么不懂事？我和你爸还想抱孙子呢。"你挂了电话,看着账单,叹了口气。',
+
+            death: {
+                chance: 0,
+                reason: ''
+            },
+
+            ageJump: { min: 3, max: 5 },
+            attributes: {
+                health: -10,
+                charm: -8,
+                luck: -10
+            }
+        },
 
         // ========== 新增事件 - 老年期 ==========
         {
@@ -721,8 +939,14 @@ const GameEvents = {
             attractiveness: 'low',
             category: 'family',
 
+            // 前置条件: 必须有孩子,且孩子至少20岁(才可能有孙子)
+            prerequisites: {
+                hasChild: true,
+                childAge: { min: 20 }
+            },
+
             text: '孙子教你用智能手机。你学了半天还是不会。他有点不耐烦了。',
-            result: '你说："算了算了,你去玩吧。"孙子如释重负地跑了。你看着手机,不知道按哪里。',
+            result: '你说:"算了算了,你去玩吧。"孙子如释重负地跑了。你看着手机,不知道按哪里。',
 
             death: {
                 chance: 0,
@@ -756,6 +980,50 @@ const GameEvents = {
                 intelligence: +10,
                 charm: -5,
                 health: -8
+            }
+        },
+        {
+            id: 'elder_n6',
+            type: 'narrative',
+            ageGroup: 'elder',
+            attractiveness: 'high',
+            category: 'daily',
+
+            text: '一个年轻人敲你门,说要送你免费的保健品,只要听他讲一小时。',
+            result: '你想反正闲着也是闲着。结果听完后,你花了3万块买了一堆"包治百病"的药。回家后越想越不对,但推销员的电话已经打不通了。',
+
+            death: {
+                chance: 0.12,
+                reason: '吃了假保健品中毒身亡。'
+            },
+
+            ageJump: { min: 5, max: 10 },
+            attributes: {
+                intelligence: -20,
+                health: -15,
+                luck: -25
+            }
+        },
+        {
+            id: 'elder_n7',
+            type: 'narrative',
+            ageGroup: 'elder',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            text: '你坐公交车。一个年轻人坐在老弱病残座上玩手机。你站在Ta旁边。',
+            result: '年轻人看了你一眼,继续玩手机。你想说什么,但又怕被说"倚老卖老"。你默默站到了终点站。下车时腿都麻了。',
+
+            death: {
+                chance: 0.08,
+                reason: '因为久站,静脉血栓,突发脑梗。'
+            },
+
+            ageJump: { min: 5, max: 10 },
+            attributes: {
+                health: -15,
+                charm: -10,
+                luck: -12
             }
         }
     ],
@@ -1240,31 +1508,46 @@ const GameEvents = {
             attractiveness: 'high',
             category: 'love',
 
-            event: '你交往3年的对象突然说："我们结婚吧，不然就分手。"但你还没准备好。',
+            // 前置条件: 无伴侣才会有"交往3年的对象"
+            prerequisites: {
+                hasPartner: false
+            },
+
+            event: '你交往3年的对象突然说:"我们结婚吧,不然就分手。"但你还没准备好。',
 
             choices: [
                 {
                     text: '同意结婚',
                     successRate: 0.6,
                     success: {
-                        result: '婚后生活虽然琐碎，但你们很幸福。你觉得这个决定是对的。',
+                        result: '婚后生活虽然琐碎,但你们很幸福。你觉得这个决定是对的。',
                         attributes: { charm: +15, health: +10, luck: +10 },
+                        // 状态改变: 获得伴侣
+                        effects: {
+                            hasPartner: true,
+                            partnerSince: 'current'
+                        },
                         reversal: {
                             chance: 0.15,
-                            text: '但两年后Ta开始频繁加班晚归。你发现蛛丝马迹，原来Ta早就出轨了。离婚时你人财两空。',
+                            text: '但两年后Ta开始频繁加班晚归。你发现蛛丝马迹,原来Ta早就出轨了。分手时你人财两空。',
                             attributes: { health: -20, luck: -20, charm: -15 },
+                            // 状态改变: 反转导致失去伴侣
+                            effects: {
+                                hasPartner: false
+                            },
                             death: {
                                 chance: 0.15,
-                                reason: '离婚纠纷中被对方家人打死。'
+                                reason: '分手纠纷中被对方家人打死。'
                             }
                         }
                     },
                     failure: {
-                        result: '仓促结婚导致矛盾重重。你们不到一年就离婚了。',
+                        result: '仓促结婚导致矛盾重重。你们不到一年就分手了。',
                         attributes: { health: -15, luck: -15, charm: -10 },
+                        // 状态改变: 失败=短暂在一起后分手(保持无伴侣状态)
                         death: {
                             chance: 0.13,
-                            reason: '离婚后抑郁自杀。'
+                            reason: '分手后抑郁自杀。'
                         }
                     }
                 },
@@ -1272,12 +1555,18 @@ const GameEvents = {
                     text: '请求再等一年',
                     successRate: 0.5,
                     success: {
-                        result: 'Ta同意了。这一年你们更加了解彼此，最终幸福地结婚了。',
+                        result: 'Ta同意了。这一年你们更加了解彼此,最终幸福地在一起了。',
                         attributes: { intelligence: +15, charm: +15, luck: +5 },
+                        // 状态改变: 成功后获得伴侣
+                        effects: {
+                            hasPartner: true,
+                            partnerSince: 'current'
+                        },
                         reversal: {
                             chance: 0.15,
-                            text: '但半年后Ta告诉你，Ta遇到了更合适的人。这一年的等待成了笑话，Ta头也不回地离开了。',
+                            text: '但半年后Ta告诉你,Ta遇到了更合适的人。这一年的等待成了笑话,Ta头也不回地离开了。',
                             attributes: { charm: -20, health: -15 },
+                            // 反转: 分手,不改变状态(保持无伴侣)
                             death: {
                                 chance: 0.15,
                                 reason: '心碎致死。'
@@ -1285,8 +1574,9 @@ const GameEvents = {
                         }
                     },
                     failure: {
-                        result: 'Ta觉得你在拖延，直接跟你分手了。',
+                        result: 'Ta觉得你在拖延,直接跟你分手了。',
                         attributes: { charm: -15, health: -10 },
+                        // 失败: 分手,不改变状态(保持无伴侣)
                         death: {
                             chance: 0,
                             reason: ''
@@ -1323,6 +1613,428 @@ const GameEvents = {
             ageJump: { min: 1, max: 3 }
         },
 
+        // ========== 新增 - 青年期选择事件 (网络时代特色) ==========
+        {
+            id: 'young_c4',
+            type: 'choice',
+            ageGroup: 'young',
+            attractiveness: 'high',
+            category: 'love',
+
+            event: '你在网上认识了一个人,聊了三个月,Ta说想见面。你看过照片,是个大美女/帅哥。',
+
+            choices: [
+                {
+                    text: '激动地去见面',
+                    successRate: 0.3,
+                    success: {
+                        result: '真人比照片还好看！你们一见钟情,当天就确定了关系。',
+                        attributes: { charm: +25, luck: +20, health: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '结果是照骗。真人胖了50斤,还带了个6岁的孩子。你尴尬地吃完饭,理由说公司着火了,落荒而逃。',
+                            attributes: { charm: -20, luck: -15, health: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '对面坐着一个大叔/大妈。你刚想走,被几个壮汉围住了。这是仙人跳,你被敲诈了5万。',
+                        attributes: { luck: -25, health: -20, intelligence: -15 },
+                        death: {
+                            chance: 0.18,
+                            reason: '反抗时被打死。'
+                        }
+                    }
+                },
+                {
+                    text: '要求视频验证',
+                    successRate: 0.7,
+                    success: {
+                        result: '视频是真的!你们见面很愉快,发展得很顺利。',
+                        attributes: { intelligence: +20, charm: +15, luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '见面时你傻眼了:对方用的AI换脸视频。本人长得像无脸男。你借口上厕所,从窗户翻走了。',
+                            attributes: { luck: -15, charm: -10 },
+                            death: {
+                                chance: 0.08,
+                                reason: '翻窗时摔死。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '对方拒绝视频,骂你不信任Ta。你们不欢而散。',
+                        attributes: { charm: -10, luck: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '算了,专心工作',
+                    successRate: 0.8,
+                    success: {
+                        result: '你选择了现实。后来你发现Ta的照片是偷别人的,险些被骗。',
+                        attributes: { intelligence: +20, luck: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但Ta真的是照片本人,还是个富二代。现在Ta和别人结婚了,你在朋友圈看到豪车豪宅,后悔到失眠。',
+                            attributes: { luck: -20, health: -15 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你太专注工作,30岁还单身。父母天天催婚。',
+                        attributes: { intelligence: +10, charm: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 1, max: 3 }
+        },
+        {
+            id: 'young_c5',
+            type: 'choice',
+            ageGroup: 'young',
+            attractiveness: 'high',
+            category: 'money',
+
+            event: '你朋友做直播带货月入10万,劝你也做。你需要投5万进货,但不确定能不能卖出去。',
+
+            choices: [
+                {
+                    text: '梭哈!投5万',
+                    successRate: 0.2,
+                    success: {
+                        result: '你意外爆火!因为太尴尬反而成了特色。三个月赚了50万,成了小网红。',
+                        attributes: { luck: +30, charm: +25, intelligence: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但平台改规则了,你的账号因为"虚假宣传"被封了。5万的货砸手里,只能摆地摊甩卖,亏了4万。',
+                            attributes: { luck: -35, health: -25, charm: -20 },
+                            death: {
+                                chance: 0.15,
+                                reason: '压力过大,猝死在直播间。死前还在喊"宝宝们买它"。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你连话都说不清楚,一个月只卖出去3单。5万货砸手里了,只能2万贱卖清仓。',
+                        attributes: { luck: -30, health: -20, intelligence: -15 },
+                        death: {
+                            chance: 0.18,
+                            reason: '债务压力过大,跳楼自杀。'
+                        }
+                    }
+                },
+                {
+                    text: '小额试水1万',
+                    successRate: 0.5,
+                    success: {
+                        result: '你发现这活挺累的,但还能赚点。月入5000,比工资多点。',
+                        attributes: { luck: +15, charm: +10, intelligence: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '货卖不出去,砸手里了。你亏了8000,还被亲戚嘲笑"年纪轻轻不好好上班,整这些幺蛾子"。',
+                            attributes: { luck: -15, charm: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '一分没赚,白忙活三个月。你的直播间最高在线人数:2人(你和你妈)。',
+                        attributes: { luck: -10, charm: -8, intelligence: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '不做,太冒险',
+                    successRate: 0.8,
+                    success: {
+                        result: '你保住了5万块。半年后朋友告诉你,他亏了20万,还欠了一屁股债。',
+                        attributes: { intelligence: +20, luck: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但朋友真的发财了!现在开着特斯拉,住着大平层。你还在挤地铁,吃外卖,月光。',
+                            attributes: { luck: -20, intelligence: -10, health: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '朋友觉得你太怂,疏远了你。',
+                        attributes: { charm: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 1, max: 3 }
+        },
+        {
+            id: 'young_c6',
+            type: 'choice',
+            ageGroup: 'young',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            event: '健身房销售盯着你:"今天办卡立减2000!只剩最后一个名额!"你看了看镜子里的肚腩。',
+
+            choices: [
+                {
+                    text: '办三年卡(5000元)',
+                    successRate: 0.3,
+                    success: {
+                        result: '你真的坚持了!三年练出了腹肌,整个人脱胎换骨。',
+                        attributes: { health: +30, charm: +25, intelligence: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '第4次去的时候,健身房大门紧锁,上面贴着:"老板跑路,请报警。"你的5000块和前3次的决心一起,蒸发了。',
+                            attributes: { luck: -25, health: -15, charm: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你去了三次就不去了。每次路过健身房都心虚绕路。5000块买了个教训:自律真的很难。',
+                        attributes: { luck: -20, health: -15, charm: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '办月卡(300元)',
+                    successRate: 0.7,
+                    success: {
+                        result: '试了一个月,感觉还不错,决定继续。你找到了适合自己的节奏。',
+                        attributes: { health: +20, intelligence: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '去了一次,累成狗,从此再也不去。300块打了水漂。健身卡就躺在钱包里,提醒你又一次高估了自己。',
+                            attributes: { health: -10, luck: -8 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '月卡也能跑路?一个月没到健身房就关门了。你服了。',
+                        attributes: { luck: -10, health: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '不办,回家刘畊宏',
+                    successRate: 0.8,
+                    success: {
+                        result: '你在家跟着视频练,省钱又自由。虽然效果慢点,但坚持下来了。',
+                        attributes: { health: +15, intelligence: +15, luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '结果你跟着跳了一次腰就闪了,在床上躺了一周。邻居投诉你太吵,物业警告你。你放弃了。',
+                            attributes: { health: -15, charm: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '视频下载了,但你从未点开过。肚腩越来越大。',
+                        attributes: { health: -10, charm: -8 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 1, max: 3 }
+        },
+        {
+            id: 'young_c7',
+            type: 'choice',
+            ageGroup: 'young',
+            attractiveness: 'high',
+            category: 'daily',
+
+            event: '你看中了一个便宜的房子,但房东提出奇怪要求:"每月必须陪我吃一次饭。"',
+
+            choices: [
+                {
+                    text: '答应要求',
+                    successRate: 0.6,
+                    success: {
+                        result: '房东是个孤独的老太太。你每月陪她吃饭聊天,她很开心,还主动给你减了500房租。',
+                        attributes: { charm: +20, intelligence: +10, luck: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '房东是个控制狂!天天查房,检查卫生,半夜敲门问你睡了没。三个月后你崩溃了,宁愿多花钱也要搬走。',
+                            attributes: { health: -20, charm: -15, luck: -10 },
+                            death: {
+                                chance: 0.10,
+                                reason: '被房东逼疯,精神崩溃跳楼。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '第一次吃饭,房东就说:"叫妈,我就让你免租。"你吓得当晚就搬走了。',
+                        attributes: { luck: -15, charm: -10, health: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '拒绝,继续找房',
+                    successRate: 0.7,
+                    success: {
+                        result: '你找到了正常房子,虽然贵点,但住得安心。',
+                        attributes: { intelligence: +15, health: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '你找了三个月,期间住宾馆花了1万。最后找到的房子比那个还贵,还是地下室。你后悔了。',
+                            attributes: { luck: -15, health: -10, charm: -8 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '租房太难了,你住宾馆住到倾家荡产,最后只能睡网吧。',
+                        attributes: { luck: -20, health: -15, charm: -15 },
+                        death: {
+                            chance: 0.12,
+                            reason: '睡网吧时被人打劫致死。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 1, max: 3 }
+        },
+        {
+            id: 'young_c8',
+            type: 'choice',
+            ageGroup: 'young',
+            attractiveness: 'high',
+            category: 'daily',
+
+            event: '好久不见的老同学约你,说有个"赚钱机会"。你去了发现是个密闭房间,里面坐满了人在鼓掌。',
+
+            choices: [
+                {
+                    text: '硬闯出去',
+                    successRate: 0.7,
+                    success: {
+                        result: '你推开门卫,冲了出去!报警后这个传销窝点被端了,你上了新闻,还拿了5000奖金。',
+                        attributes: { intelligence: +25, luck: +20, charm: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '你冲到门口被几个壮汉按住暴打。醒来时发现自己在医院,住了一个月,花了3万。',
+                            attributes: { health: -30, luck: -25, charm: -15 },
+                            death: {
+                                chance: 0.20,
+                                reason: '被打成重伤,抢救无效。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你被抓住了,关在黑屋子里三天。家人报警后你才被救出来,但精神受到了创伤。',
+                        attributes: { health: -25, luck: -20, intelligence: -10 },
+                        death: {
+                            chance: 0.18,
+                            reason: '被殴打致死。'
+                        }
+                    }
+                },
+                {
+                    text: '假装配合,伺机报警',
+                    successRate: 0.5,
+                    success: {
+                        result: '你稳住他们,偷偷发了定位给家人。警察破门而入,你成功获救。',
+                        attributes: { intelligence: +30, luck: +20 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但你装得太像了,真的被洗脑了!你加入传销一年,骗了三个老同学。清醒后你愧疚得想自杀。',
+                            attributes: { intelligence: -30, charm: -25, luck: -20 },
+                            death: {
+                                chance: 0.25,
+                                reason: '愧疚自杀。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '他们看穿你了,把你毒打一顿,扔在了荒郊野外。',
+                        attributes: { health: -30, luck: -25, charm: -15 },
+                        death: {
+                            chance: 0.22,
+                            reason: '被打死在荒郊野外。'
+                        }
+                    }
+                },
+                {
+                    text: '听他们讲完',
+                    successRate: 0.3,
+                    success: {
+                        result: '你全程冷眼旁观。讲完后你说了句:"我要报警。"全场鸦雀无声,他们怂了,让你走了。',
+                        attributes: { intelligence: +20, charm: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '结果你被说服了!你觉得这个项目真的能赚钱,交了2万会员费。三个月后你一分没赚,还拉不到人头,血本无归。',
+                            attributes: { intelligence: -25, luck: -30, charm: -20 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你越听越入迷,最后真的信了,交了2万。醒悟后你已经倾家荡产。',
+                        attributes: { intelligence: -30, luck: -30, charm: -25 },
+                        death: {
+                            chance: 0.15,
+                            reason: '负债累累,跳楼自杀。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 1, max: 3 }
+        },
+
         // ========== 中年期（36-50岁）==========
         {
             id: 'middle_c1',
@@ -1331,7 +2043,14 @@ const GameEvents = {
             attractiveness: 'high',
             category: 'family',
 
-            event: '你儿子沉迷游戏，成绩一落千丈。老师建议你多陪陪孩子，但你工作很忙。',
+            // 前置条件: 有孩子,孩子7-18岁(学龄期),孩子未离家(不要求有伴侣,单亲家庭也可能有此问题)
+            prerequisites: {
+                hasChild: true,
+                childAgeRange: [7, 18],
+                NOT_childLeftHome: true
+            },
+
+            event: '儿子整天沉迷游戏,成绩一落千丈。老师建议你多陪陪孩子,但你工作很忙。',
 
             choices: [
                 {
@@ -1363,15 +2082,15 @@ const GameEvents = {
                     text: '请私教辅导',
                     successRate: 0.6,
                     success: {
-                        result: '私教很负责，孩子成绩慢慢提高了。虽然花了不少钱，但有效果。',
+                        result: '私教很负责,孩子成绩慢慢提高了。虽然花了不少钱,但有效果。',
                         attributes: { intelligence: +15, luck: +10 },
                         reversal: {
                             chance: 0.15,
-                            text: '但私教跟你老婆跑了，还卷走了你的钱。',
+                            text: '但私教卷钱跑路了,孩子成绩反而更差了。你的钱打了水漂。',
                             attributes: { luck: -25, health: -20, charm: -15 },
                             death: {
                                 chance: 0.20,
-                                reason: '气急攻心，当场去世。'
+                                reason: '气急攻心,当场去世。'
                             }
                         }
                     },
@@ -1388,12 +2107,13 @@ const GameEvents = {
                     text: '严格管教',
                     successRate: 0.5,
                     success: {
-                        result: '你采取了强硬手段，没收手机，制定学习计划。孩子虽然抗拒但成绩确实提高了。',
+                        result: '你采取了强硬手段,没收手机,制定学习计划。孩子虽然抗拒但成绩确实提高了。',
                         attributes: { intelligence: +15, charm: +5 },
                         reversal: {
                             chance: 0.15,
-                            text: '但孩子因此记恨你，成年后跟你断绝了关系。',
+                            text: '但孩子因此记恨你,成年后跟你断绝了关系。',
                             attributes: { charm: -20, health: -15 },
+                            // 反转: 孩子断绝关系(暂不追踪此状态,简化处理)
                             death: {
                                 chance: 0.12,
                                 reason: '晚年孤独抑郁而死。'
@@ -1401,8 +2121,13 @@ const GameEvents = {
                         }
                     },
                     failure: {
-                        result: '孩子反叛心更强了，离家出走。你后悔不已。',
+                        result: '孩子反叛心更强了,离家出走。你后悔不已。',
                         attributes: { charm: -15, health: -15, luck: -10 },
+                        // 状态改变: 孩子离家出走!
+                        effects: {
+                            childLeftHome: true,
+                            childLeftAge: 'current'
+                        },
                         death: {
                             chance: 0.17,
                             reason: '愧疚到心脏病发作。'
@@ -1478,6 +2203,200 @@ const GameEvents = {
             ageJump: { min: 3, max: 5 }
         },
 
+        // ========== 新增 - 中年期选择事件 ==========
+        {
+            id: 'middle_c3',
+            type: 'choice',
+            ageGroup: 'middle',
+            attractiveness: 'high',
+            category: 'money',
+
+            event: '你在路上捡到一个钱包,里面有5万现金和身份证。你可以还给失主。',
+
+            choices: [
+                {
+                    text: '物归原主',
+                    successRate: 0.8,
+                    success: {
+                        result: '失主很感激,给了你5000酬谢金。你做了件好事,心里踏实。',
+                        attributes: { charm: +15, luck: +15, intelligence: +5 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但失主后来反咬一口,说钱包里本来有10万。报警后监控证明你清白,但你被折腾了一个月,还被网暴了。',
+                            attributes: { health: -15, luck: -15, charm: -10 },
+                            death: {
+                                chance: 0.12,
+                                reason: '网暴压力过大,自杀。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '失主态度很差,觉得你偷了钱包。你做好事反被骂。',
+                        attributes: { charm: -10, luck: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '据为己有',
+                    successRate: 0.6,
+                    success: {
+                        result: '你把现金留下,钱包扔了。5万块让你松了口气。',
+                        attributes: { luck: +20 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但监控拍到了你。警察找上门,以盗窃罪起诉你。你赔了10万,还被拘留半年。',
+                            attributes: { luck: -30, health: -25, charm: -20 },
+                            death: {
+                                chance: 0.15,
+                                reason: '拘留期间被狱友打死。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你刚拿钱没走几步,失主追上来了。你被当场抓住,很丢人。',
+                        attributes: { charm: -20, luck: -15, intelligence: -10 },
+                        death: {
+                            chance: 0.10,
+                            reason: '羞愧难当,跳楼自杀。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 3, max: 5 }
+        },
+        {
+            id: 'middle_c4',
+            type: 'choice',
+            ageGroup: 'middle',
+            attractiveness: 'medium',
+            category: 'health',
+
+            event: '你最近总是头晕。医生建议住院检查,但要请假一周,项目会耽误。',
+
+            choices: [
+                {
+                    text: '住院检查',
+                    successRate: 0.7,
+                    success: {
+                        result: '检查出了早期肿瘤,及时治疗救了你一命。',
+                        attributes: { health: +20, intelligence: +15, luck: +20 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但因为请假,项目黄了,公司损失惨重。你被降职处分,还扣了半年工资。',
+                            attributes: { luck: -20, charm: -15 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '检查了一堆,什么病都没有。你请假耽误了项目,老板很不满。',
+                        attributes: { luck: -10, charm: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '坚持工作',
+                    successRate: 0.5,
+                    success: {
+                        result: '你咬牙完成了项目,头晕也慢慢好了。原来只是太累了。',
+                        attributes: { intelligence: +15, charm: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但三个月后你突然晕倒。检查出脑瘤晚期,已经无法手术了。',
+                            attributes: { health: -40, luck: -30 },
+                            death: {
+                                chance: 0.40,
+                                reason: '脑瘤晚期,不治身亡。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你在项目汇报时晕倒了。送医院检查出重病,已经晚期了。',
+                        attributes: { health: -30, luck: -25 },
+                        death: {
+                            chance: 0.35,
+                            reason: '重病晚期,抢救无效。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 3, max: 5 }
+        },
+        {
+            id: 'middle_c5',
+            type: 'choice',
+            ageGroup: 'middle',
+            attractiveness: 'high',
+            category: 'family',
+
+            event: '你妈病了,需要人照顾。但你工作很忙,孩子也需要管。',
+
+            choices: [
+                {
+                    text: '辞职照顾',
+                    successRate: 0.6,
+                    success: {
+                        result: '你妈很快康复了。虽然失去了工作,但你觉得值得。',
+                        attributes: { charm: +20, health: +10, intelligence: +5 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但你妈病情反复,拖了三年才去世。你的积蓄花光了,还错过了最佳求职年龄。',
+                            attributes: { luck: -25, health: -20, charm: -15 },
+                            death: {
+                                chance: 0.15,
+                                reason: '经济压力过大,猝死。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你妈病情恶化了。你失去了工作,也没能救回她。',
+                        attributes: { health: -25, luck: -20, charm: -15 },
+                        death: {
+                            chance: 0.20,
+                            reason: '愧疚到心脏病发作。'
+                        }
+                    }
+                },
+                {
+                    text: '请保姆',
+                    successRate: 0.7,
+                    success: {
+                        result: '保姆很负责,你妈恢复得不错。你平衡了工作和家庭。',
+                        attributes: { intelligence: +15, luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但保姆虐待你妈,还偷了家里的钱跑了。你妈伤心欲绝,你后悔莫及。',
+                            attributes: { charm: -25, health: -20, luck: -15 },
+                            death: {
+                                chance: 0.18,
+                                reason: '你妈因为打击过大去世,你愧疚到自杀。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '保姆不靠谱,你妈的病没有好转。你两边操心,身心俱疲。',
+                        attributes: { health: -15, luck: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 3, max: 5 }
+        },
+
         // ========== 老年期（51-100岁）==========
         {
             id: 'elder_c1',
@@ -1486,7 +2405,13 @@ const GameEvents = {
             attractiveness: 'medium',
             category: 'family',
 
-            event: '你的积蓄够养老了。孩子们希望你资助他们买房，但这会花掉你一半的积蓄。',
+            // 前置条件: 必须有孩子,且孩子至少22岁(大学毕业,有买房需求)
+            prerequisites: {
+                hasChild: true,
+                childAge: { min: 22 }
+            },
+
+            event: '你的积蓄够养老了。孩子们希望你资助他们买房,但这会花掉你一半的积蓄。',
 
             choices: [
                 {
@@ -1600,6 +2525,328 @@ const GameEvents = {
                         death: {
                             chance: 0.30,
                             reason: '病情恶化去世。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 5, max: 10 }
+        },
+
+        // ========== 新增 - 老年期选择事件 (紧急！) ==========
+        {
+            id: 'elder_c3',
+            type: 'choice',
+            ageGroup: 'elder',
+            attractiveness: 'high',
+            category: 'money',
+
+            event: '一个年轻人敲你家门，说要帮你"以房养老"。只要签个合同，每月能领5000元。',
+
+            choices: [
+                {
+                    text: '签合同',
+                    successRate: 0.2,
+                    success: {
+                        result: '原来是正规公司，手续合法。你每月领钱，生活质量提高了。',
+                        attributes: { luck: +20, health: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但三年后公司暴雷跑路了。你的房子被法院查封拍卖。你无家可归，流落街头。',
+                            attributes: { health: -30, luck: -30, charm: -20 },
+                            death: {
+                                chance: 0.25,
+                                reason: '露宿街头，冻死。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '这是个骗局！你的房子被骗走了，积蓄也没了。',
+                        attributes: { luck: -30, health: -25, intelligence: -15 },
+                        death: {
+                            chance: 0.30,
+                            reason: '悲愤交加，心脏病发作。'
+                        }
+                    }
+                },
+                {
+                    text: '拒绝',
+                    successRate: 0.9,
+                    success: {
+                        result: '你让他走了。后来新闻报道这是个骗局，骗了很多老人。你逃过一劫。',
+                        attributes: { intelligence: +20, luck: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但你的老伙伴签了，现在每月领5000过得很滋润。你有点后悔。',
+                            attributes: { luck: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你拒绝得太直接，年轻人破口大骂。你被吓到了。',
+                        attributes: { health: -10, charm: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 5, max: 10 }
+        },
+        {
+            id: 'elder_c4',
+            type: 'choice',
+            ageGroup: 'elder',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            event: '你在公园遛弯时,一个女孩撞到你摔倒了。她家人冲过来,说要报警让你赔钱。',
+
+            choices: [
+                {
+                    text: '赔5000私了',
+                    successRate: 0.3,
+                    success: {
+                        result: '他们拿了钱就走了。你花钱买平安。',
+                        attributes: { luck: -10, health: -5 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但路人把视频发到网上,证明是女孩自己摔的。网友骂他们碰瓷,他们被警察抓了。你的5000要不回来了。',
+                            attributes: { luck: -15, intelligence: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '他们拿了钱还报警,说你推人。你被讹诈了。',
+                        attributes: { luck: -20, health: -15, charm: -10 },
+                        death: {
+                            chance: 0.15,
+                            reason: '气得脑溢血。'
+                        }
+                    }
+                },
+                {
+                    text: '报警',
+                    successRate: 0.8,
+                    success: {
+                        result: '监控证明是女孩自己摔的。警察把碰瓷的一家带走了。',
+                        attributes: { intelligence: +20, luck: +15 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但那家人记恨你,三天两头来你家门口骂街。你不敢出门了。',
+                            attributes: { health: -15, charm: -10 },
+                            death: {
+                                chance: 0.12,
+                                reason: '被吓出心脏病。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '监控坏了,警察让你赔钱。你有苦说不出。',
+                        attributes: { luck: -15, health: -10 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 5, max: 10 }
+        },
+        {
+            id: 'elder_c5',
+            type: 'choice',
+            ageGroup: 'elder',
+            attractiveness: 'high',
+            category: 'family',
+
+            event: '你的老伴去世了。孩子们劝你再找一个伴,但你觉得这样对不起逝者。',
+
+            choices: [
+                {
+                    text: '找个老伴',
+                    successRate: 0.6,
+                    success: {
+                        result: '你找到了一个聊得来的老人。两人互相照顾,晚年不孤单。',
+                        attributes: { charm: +20, health: +15, luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但对方只是想要你的房子。半年后卷走你的存款,人间蒸发了。',
+                            attributes: { luck: -25, health: -20, charm: -15 },
+                            death: {
+                                chance: 0.20,
+                                reason: '打击过大,心力衰竭。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '相亲了很多次都不合适。你放弃了。',
+                        attributes: { charm: -10, health: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '守着回忆',
+                    successRate: 0.7,
+                    success: {
+                        result: '你每天去老伴墓前说话。虽然孤独,但心里踏实。',
+                        attributes: { intelligence: +15, charm: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但你越来越孤独。有一天你在家摔倒,躺了两天才被发现。',
+                            attributes: { health: -20, luck: -15 },
+                            death: {
+                                chance: 0.25,
+                                reason: '孤独死。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你太孤独了,每天以泪洗面。健康迅速恶化。',
+                        attributes: { health: -20, charm: -15, luck: -10 },
+                        death: {
+                            chance: 0.20,
+                            reason: '孤独抑郁而死。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 5, max: 10 }
+        },
+        {
+            id: 'elder_c6',
+            type: 'choice',
+            ageGroup: 'elder',
+            attractiveness: 'medium',
+            category: 'daily',
+
+            event: '你在超市买菜,收银员找错钱了,多给了你100块。你发现了。',
+
+            choices: [
+                {
+                    text: '归还',
+                    successRate: 0.9,
+                    success: {
+                        result: '收银员很感激,经理知道后给你送了购物卡。',
+                        attributes: { charm: +15, luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但你在回家路上购物卡被小偷偷了。',
+                            attributes: { luck: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '收银员觉得你在找麻烦,态度很差。你心里不舒服。',
+                        attributes: { charm: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '装不知道',
+                    successRate: 0.7,
+                    success: {
+                        result: '你拿着多的100块回家了。虽然有点愧疚,但也算意外之财。',
+                        attributes: { luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但监控拍到了。第二天经理打电话让你还钱,态度很恶劣。你在超市被围观,丢人现眼。',
+                            attributes: { charm: -20, luck: -15 },
+                            death: {
+                                chance: 0.10,
+                                reason: '羞愧难当,回家后心脏病发作。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '收银员当场发现了,大声质问你。周围人都在看。',
+                        attributes: { charm: -15, luck: -10 },
+                        death: {
+                            chance: 0.08,
+                            reason: '羞愧到心脏病发作。'
+                        }
+                    }
+                }
+            ],
+
+            ageJump: { min: 5, max: 10 }
+        },
+        {
+            id: 'elder_c7',
+            type: 'choice',
+            ageGroup: 'elder',
+            attractiveness: 'high',
+            category: 'daily',
+
+            event: '你看到广场舞队伍在招新人。你跳舞一般,但很想加入,找点事做。',
+
+            choices: [
+                {
+                    text: '加入',
+                    successRate: 0.7,
+                    success: {
+                        result: '你融入了集体,每天和大家一起跳舞聊天。晚年充实多了。',
+                        attributes: { health: +20, charm: +15, luck: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但广场舞队长总是针对你,说你跳得不好。其他人也跟着排挤你。你被孤立了。',
+                            attributes: { charm: -15, health: -10 },
+                            death: {
+                                chance: 0,
+                                reason: ''
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你跟不上节奏,队长说你不合适。你很失落。',
+                        attributes: { charm: -10, health: -5 },
+                        death: {
+                            chance: 0,
+                            reason: ''
+                        }
+                    }
+                },
+                {
+                    text: '放弃',
+                    successRate: 0.8,
+                    success: {
+                        result: '你自己在家看电视。虽然孤独,但至少不用看人脸色。',
+                        attributes: { intelligence: +10 },
+                        reversal: {
+                            chance: 0.15,
+                            text: '但你越来越孤僻。邻居都觉得你是个怪人。',
+                            attributes: { charm: -15, health: -10 },
+                            death: {
+                                chance: 0.15,
+                                reason: '孤独死。三天后才被发现。'
+                            }
+                        }
+                    },
+                    failure: {
+                        result: '你太孤独了,整天闷在家里。身体越来越差。',
+                        attributes: { health: -15, charm: -10 },
+                        death: {
+                            chance: 0.18,
+                            reason: '孤独抑郁而死。'
                         }
                     }
                 }

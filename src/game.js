@@ -10,6 +10,19 @@ class TextLifeGame {
         this.gameState = 'menu'; // menu, playing, dead
         this.currentEvent = null;
 
+        // 生活状态追踪 (v2.0简化版)
+        this.lifeState = {
+            partner: {
+                hasPartner: false,      // 是否有伴侣(结婚/同居/长期恋爱都算)
+                partnerSince: null      // 有伴侣的起始年龄
+            },
+            children: {
+                hasChild: false,        // 是否有孩子(亲生/领养/继子女都算)
+                childJoinAge: null,     // 孩子加入家庭时玩家年龄
+                childLeftHome: false    // 孩子是否离家/独立
+            }
+        };
+
         // 事件去重 (分别记录选择事件和旁白事件)
         this.recentChoiceEvents = [];     // 最近5个选择事件
         this.recentNarrativeEvents = [];  // 最近7个旁白事件
@@ -145,6 +158,19 @@ class TextLifeGame {
         this.recentChoiceEvents = [];
         this.recentNarrativeEvents = [];
 
+        // 重置生活状态
+        this.lifeState = {
+            partner: {
+                hasPartner: false,
+                partnerSince: null
+            },
+            children: {
+                hasChild: false,
+                childJoinAge: null,
+                childLeftHome: false
+            }
+        };
+
         this.clearOutput();
         this.clearChoices();
 
@@ -175,6 +201,80 @@ class TextLifeGame {
     // ============================================
     // 事件筛选系统
     // ============================================
+
+    // 检查事件前置条件 (v2.0)
+    canTriggerEvent(event) {
+        if (!event.prerequisites) return true;
+
+        const prereq = event.prerequisites;
+
+        // 检查伴侣状态
+        if (prereq.hasPartner !== undefined) {
+            if (prereq.hasPartner !== this.lifeState.partner.hasPartner) {
+                return false;
+            }
+        }
+
+        // 检查有伴侣年数
+        if (prereq.partnerYears !== undefined) {
+            if (!this.lifeState.partner.hasPartner) return false;
+            const yearsWithPartner = this.character.age - this.lifeState.partner.partnerSince;
+            if (prereq.partnerYears.min && yearsWithPartner < prereq.partnerYears.min) {
+                return false;
+            }
+            if (prereq.partnerYears.max && yearsWithPartner > prereq.partnerYears.max) {
+                return false;
+            }
+        }
+
+        // 检查孩子状态
+        if (prereq.hasChild !== undefined) {
+            if (prereq.hasChild !== this.lifeState.children.hasChild) {
+                return false;
+            }
+        }
+
+        // 检查孩子年龄范围
+        if (prereq.childAgeRange !== undefined) {
+            if (!this.lifeState.children.hasChild) return false;
+            const childAge = this.character.age - this.lifeState.children.childJoinAge;
+            const [minAge, maxAge] = prereq.childAgeRange;
+            if (childAge < minAge || childAge > maxAge) {
+                return false;
+            }
+        }
+
+        // 检查孩子最小年龄
+        if (prereq.childAge !== undefined) {
+            if (!this.lifeState.children.hasChild) return false;
+            const childAge = this.character.age - this.lifeState.children.childJoinAge;
+            if (prereq.childAge.min && childAge < prereq.childAge.min) {
+                return false;
+            }
+            if (prereq.childAge.max && childAge > prereq.childAge.max) {
+                return false;
+            }
+        }
+
+        // 检查孩子未离家
+        if (prereq.NOT_childLeftHome !== undefined) {
+            if (prereq.NOT_childLeftHome && this.lifeState.children.childLeftHome) {
+                return false;
+            }
+        }
+
+        // 检查玩家年龄限制
+        if (prereq.age !== undefined) {
+            if (prereq.age.min && this.character.age < prereq.age.min) {
+                return false;
+            }
+            if (prereq.age.max && this.character.age > prereq.age.max) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     // 根据年龄段筛选事件
     filterEventsByAge(events, ageGroup) {
@@ -252,7 +352,14 @@ class TextLifeGame {
             candidates = allEvents;
         }
 
-        // 第二步：去重筛选
+        // 第二步：前置条件筛选 (v2.0新增)
+        const beforePrereqCount = candidates.length;
+        candidates = candidates.filter(event => this.canTriggerEvent(event));
+        if (beforePrereqCount > candidates.length) {
+            console.log(`[状态系统] 前置条件筛选: ${beforePrereqCount} → ${candidates.length} (过滤了${beforePrereqCount - candidates.length}个)`);
+        }
+
+        // 第三步：去重筛选
         candidates = this.filterEventsByDeduplication(candidates, isNarrative);
 
         // 如果去重后没有候选事件，清空去重列表重新筛选
@@ -264,10 +371,12 @@ class TextLifeGame {
                 this.recentChoiceEvents = [];
             }
             candidates = this.filterEventsByAge(allEvents, ageGroup);
-            if (candidates.length === 0) candidates = allEvents;
+            // 重新应用前置条件筛选
+            candidates = candidates.filter(event => this.canTriggerEvent(event));
+            if (candidates.length === 0) candidates = allEvents.filter(event => this.canTriggerEvent(event));
         }
 
-        // 第三步：加权随机选择
+        // 第四步：加权随机选择
         return this.selectEventByWeight(candidates);
     }
 
@@ -358,6 +467,11 @@ class TextLifeGame {
         // 应用属性变化
         if (event.attributes) {
             this.applyAttributeChanges(event.attributes);
+        }
+
+        // 应用生活状态变化 (v2.0)
+        if (event.effects) {
+            this.applyEventEffects(event.effects);
         }
 
         // 年龄跳跃
@@ -452,12 +566,17 @@ class TextLifeGame {
             this.applyAttributeChangesSilent(success.attributes);
         }
 
+        // 静默应用生活状态变化 (v2.0) - 可能会被reversal撤销
+        if (success.effects) {
+            this.applyEventEffects(success.effects);
+        }
+
         // 检查是否触发反转事件
         const hasReversal = success.reversal && Math.random() < success.reversal.chance;
 
         if (hasReversal) {
             // 反转时显示属性变化
-            this.handleReversalEvent(success.reversal, event, success.attributes);
+            this.handleReversalEvent(success.reversal, event, success.attributes, success.effects);
         } else {
             // 没有反转时才显示成功的属性变化
             if (success.attributes) {
@@ -477,6 +596,11 @@ class TextLifeGame {
         // 应用属性变化
         if (failure.attributes) {
             this.applyAttributeChanges(failure.attributes);
+        }
+
+        // 应用生活状态变化 (v2.0)
+        if (failure.effects) {
+            this.applyEventEffects(failure.effects);
         }
 
         // 判断是否死亡
@@ -527,7 +651,7 @@ class TextLifeGame {
     // 反转事件处理
     // ============================================
 
-    handleReversalEvent(reversal, event, successAttributes) {
+    handleReversalEvent(reversal, event, successAttributes, successEffects) {
         this.addMessage('', 'normal');
 
         // 直接显示反转文本(移除"但是..."提示)
@@ -544,9 +668,32 @@ class TextLifeGame {
             }
         }
 
+        // 撤销成功的生活状态变化 (v2.0) - 如果反转有自己的effects就应用反转的,否则撤销成功的
+        if (successEffects && !reversal.effects) {
+            // 如果反转事件没有指定effects,就撤销成功的effects
+            // 例如: hasPartner变true → 撤销为false
+            if (successEffects.hasPartner !== undefined) {
+                this.lifeState.partner.hasPartner = !successEffects.hasPartner;
+                if (!successEffects.hasPartner) {
+                    this.lifeState.partner.partnerSince = null;
+                }
+            }
+            if (successEffects.hasChild !== undefined) {
+                this.lifeState.children.hasChild = !successEffects.hasChild;
+                if (!successEffects.hasChild) {
+                    this.lifeState.children.childJoinAge = null;
+                }
+            }
+        }
+
         // 应用反转的属性变化并显示
         if (reversal.attributes) {
             this.applyAttributeChanges(reversal.attributes);
+        }
+
+        // 应用反转的生活状态变化 (v2.0)
+        if (reversal.effects) {
+            this.applyEventEffects(reversal.effects);
         }
 
         // 判断是否死亡
@@ -567,6 +714,51 @@ class TextLifeGame {
         this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
 
         this.endGame();
+    }
+
+    // ============================================
+    // 状态改变处理 (v2.0)
+    // ============================================
+
+    // 应用事件导致的生活状态改变
+    applyEventEffects(effects) {
+        if (!effects) return;
+
+        // Debug日志
+        console.log('[状态系统] 应用effects:', effects);
+
+        // 处理伴侣状态变化
+        if (effects.hasPartner !== undefined) {
+            this.lifeState.partner.hasPartner = effects.hasPartner;
+            console.log(`[状态系统] 伴侣状态变更: ${effects.hasPartner}`);
+        }
+
+        // 记录获得伴侣的时间
+        if (effects.partnerSince === 'current') {
+            this.lifeState.partner.partnerSince = this.character.age;
+            console.log(`[状态系统] 记录伴侣起始年龄: ${this.character.age}`);
+        }
+
+        // 处理孩子状态变化
+        if (effects.hasChild !== undefined) {
+            this.lifeState.children.hasChild = effects.hasChild;
+            console.log(`[状态系统] 孩子状态变更: ${effects.hasChild}`);
+        }
+
+        // 记录孩子加入家庭的时间
+        if (effects.childJoinAge === 'current') {
+            this.lifeState.children.childJoinAge = this.character.age;
+            console.log(`[状态系统] 记录孩子加入年龄: ${this.character.age}`);
+        }
+
+        // 处理孩子离家状态
+        if (effects.childLeftHome !== undefined) {
+            this.lifeState.children.childLeftHome = effects.childLeftHome;
+            console.log(`[状态系统] 孩子离家状态变更: ${effects.childLeftHome}`);
+        }
+
+        // 显示当前完整状态
+        console.log('[状态系统] 当前生活状态:', JSON.stringify(this.lifeState, null, 2));
     }
 
     // ============================================
