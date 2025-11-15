@@ -65,46 +65,81 @@ const GameConfig = {
         targetTotalQuestions: 19,  // 总计 16-22 个问题
 
         // 叙事事件触发概率（旁白事件）
+        // 目标：20次选择约4次旁白（平均20%）
         narrativeChance: {
-            base: 0.08,      // 基础概率 8%
-            ageModifier: {   // 年龄修正
-                baby: 0.15,  // 婴儿期更多叙事（快速跳过）
-                teen: 0.05,  // 青少年期减少叙事（更多选择）
-                young: 0.03, // 青年期最少叙事（核心体验）
-                middle: 0.08,
-                elder: 0.12  // 老年期增加叙事
-            }
+            baby: 0.25,    // 25% - 婴儿期多用旁白快速跳过
+            child: 0.15,   // 15%
+            teen: 0.10,    // 10% - 青少年期减少旁白，增加选择
+            young: 0.15,   // 15% - 核心年龄段也要有旁白丰富度
+            middle: 0.20,  // 20%
+            elder: 0.25    // 25% - 老年期多用旁白快速收尾
         }
     },
 
     // ========== 角色初始属性 ==========
+    // 设计原则："低初始值，高改变值"
+    // - 初始差异小（5-15）→ 公平性
+    // - 变化幅度大（±10-20）→ 体现选择重要性
     characterStats: {
-        health: { min: 30, max: 50 },
-        intelligence: { min: 30, max: 50 },
-        luck: { min: 30, max: 50 },
-        charm: { min: 30, max: 50 }
+        health: { min: 5, max: 15 },
+        intelligence: { min: 5, max: 15 },
+        luck: { min: 5, max: 15 },
+        charm: { min: 5, max: 15 }
     },
 
-    // ========== 随机系统参数 ==========
-    randomSystem: {
-        // 属性反转概率（基础）
+    // ========== 事件系统参数 ==========
+    eventSystem: {
+        // 反转事件触发概率
+        // 在选择成功后，有15%概率触发反转事件
+        // 目的：让玩家无法认定"安全选项"
         reversalChance: 0.15,  // 15%
 
-        // 世界混乱度范围
-        worldChaos: {
-            min: 0.2,
-            max: 0.8,
-            step: 0.05  // 每次随机游走的步长
+        // 事件权重（影响出现频率）
+        attractivenessWeight: {
+            high: 10,      // 高吸引力事件（恋爱/职场/暴富）
+            medium: 5,     // 中等吸引力事件
+            low: 2         // 低吸引力事件
         },
 
-        // 连胜/连败阈值
-        streakThreshold: {
-            winning: 3,  // 连续3次好结果后增加反转概率
-            losing: 2    // 连续2次坏结果后保护玩家
+        // 内容分类权重（按年龄段动态调整）
+        categoryWeightByAge: {
+            teen: {
+                love: 2.0,      // 恋爱类事件权重 × 2
+                school: 1.5,    // 校园类事件权重 × 1.5
+                career: 0.3     // 职场类事件权重 × 0.3（几乎不出现）
+            },
+            young: {
+                love: 1.3,
+                career: 1.8,    // 职场类事件权重 × 1.8
+                money: 1.5,     // 暴富类事件权重 × 1.5
+                friendship: 1.0
+            },
+            middle: {
+                family: 1.8,    // 家庭类事件权重 × 1.8
+                career: 1.3,
+                money: 1.2
+            }
         },
 
-        // 极端事件概率
-        extremeEventChance: 0.05  // 5%
+        // 事件去重窗口大小
+        deduplication: {
+            choiceEvents: 15,      // 选择事件去重窗口(扩大到15,保证102岁游戏不重复)
+            narrativeEvents: 20    // 旁白事件去重窗口(扩大到20)
+        },
+
+        // 属性影响系统
+        attributeInfluence: {
+            enabled: true,        // 是否启用属性影响
+            maxBonus: 0.30,       // 最大影响幅度 ±30%
+
+            // 哪些属性影响哪些事件
+            mapping: {
+                love: 'charm',           // 恋爱事件受魅力影响
+                career: 'intelligence',  // 职场事件受智力影响
+                money: 'luck',           // 暴富事件受运气影响
+                family: 'charm'          // 家庭事件受魅力影响
+            }
+        }
     },
 
     // ========== 死亡概率调整 ==========
@@ -186,9 +221,7 @@ GameConfig.getAgeJump = function(age) {
 // 获取叙事事件触发概率
 GameConfig.getNarrativeChance = function(age) {
     const ageGroup = this.getAgeGroup(age);
-    const baseChance = this.gameFlow.narrativeChance.base;
-    const modifier = this.gameFlow.narrativeChance.ageModifier[ageGroup] || baseChance;
-    return modifier;
+    return this.gameFlow.narrativeChance[ageGroup] || 0.15;  // 默认15%
 };
 
 // 获取死亡概率修正

@@ -10,8 +10,17 @@ class TextLifeGame {
         this.gameState = 'menu'; // menu, playing, dead
         this.currentEvent = null;
 
-        // 事件去重
-        this.recentEvents = [];
+        // 事件去重 (分别记录选择事件和旁白事件)
+        this.recentChoiceEvents = [];     // 最近5个选择事件
+        this.recentNarrativeEvents = [];  // 最近7个旁白事件
+
+        // 属性名称中文映射
+        this.attrNameMap = {
+            health: '健康',
+            intelligence: '智力',
+            luck: '运气',
+            charm: '魅力'
+        };
 
         // DOM 元素
         this.outputEl = document.getElementById('output');
@@ -20,6 +29,7 @@ class TextLifeGame {
         this.healthEl = document.getElementById('health');
         this.intelligenceEl = document.getElementById('intelligence');
         this.luckEl = document.getElementById('luck');
+        this.charmEl = document.getElementById('charm');
         this.highscoreListEl = document.getElementById('highscore-list');
 
         this.init();
@@ -55,10 +65,11 @@ class TextLifeGame {
     }
 
     updateStats() {
-        this.ageEl.textContent = this.character.age;
-        this.healthEl.textContent = this.character.attributes.health;
-        this.intelligenceEl.textContent = this.character.attributes.intelligence;
-        this.luckEl.textContent = this.character.attributes.luck;
+        this.ageEl.textContent = `年龄: ${this.character.age}`;
+        this.healthEl.textContent = `健康: ${this.character.attributes.health}`;
+        this.intelligenceEl.textContent = `智力: ${this.character.attributes.intelligence}`;
+        this.luckEl.textContent = `运气: ${this.character.attributes.luck}`;
+        this.charmEl.textContent = `魅力: ${this.character.attributes.charm}`;
     }
 
     // ============================================
@@ -131,7 +142,8 @@ class TextLifeGame {
     startNewGame() {
         this.generateCharacter();
         this.gameState = 'playing';
-        this.recentEvents = [];
+        this.recentChoiceEvents = [];
+        this.recentNarrativeEvents = [];
 
         this.clearOutput();
         this.clearChoices();
@@ -161,68 +173,447 @@ class TextLifeGame {
     }
 
     // ============================================
-    // 事件触发（简化版）
+    // 事件筛选系统
+    // ============================================
+
+    // 根据年龄段筛选事件
+    filterEventsByAge(events, ageGroup) {
+        return events.filter(event => event.ageGroup === ageGroup);
+    }
+
+    // 事件去重筛选
+    filterEventsByDeduplication(events, isNarrative) {
+        const recentList = isNarrative ? this.recentNarrativeEvents : this.recentChoiceEvents;
+        return events.filter(event => !recentList.includes(event.id));
+    }
+
+    // 计算事件权重（基于吸引力和属性影响）
+    calculateEventWeight(event) {
+        // 基础权重（根据吸引力）
+        const baseWeight = GameConfig.eventSystem.attractivenessWeight[event.attractiveness] || 5;
+
+        // 属性影响（轻度影响，最大±30%）
+        let attributeBonus = 0;
+        if (GameConfig.eventSystem.attributeInfluence.enabled) {
+            const mapping = GameConfig.eventSystem.attributeInfluence.mapping;
+            const attrName = mapping[event.category];
+
+            if (attrName && this.character.attributes[attrName] !== undefined) {
+                const attrValue = this.character.attributes[attrName];
+                // 基准值10（初始值中位数），范围0-100
+                // 影响范围：-30%到+30%
+                attributeBonus = ((attrValue - 10) / 90) * GameConfig.eventSystem.attributeInfluence.maxBonus;
+            }
+        }
+
+        // 年龄段内容分类权重加成
+        const ageGroup = GameConfig.getAgeGroup(this.character.age);
+        const categoryWeights = GameConfig.eventSystem.categoryWeightByAge[ageGroup];
+        const categoryMultiplier = (categoryWeights && categoryWeights[event.category]) || 1.0;
+
+        // 最终权重 = 基础权重 × (1 + 属性加成) × 类别倍数
+        const finalWeight = baseWeight * (1 + attributeBonus) * categoryMultiplier;
+
+        return Math.max(0.1, finalWeight); // 确保权重至少为0.1
+    }
+
+    // 加权随机选择事件
+    selectEventByWeight(events) {
+        if (events.length === 0) return null;
+        if (events.length === 1) return events[0];
+
+        // 计算所有事件的权重
+        const weights = events.map(event => this.calculateEventWeight(event));
+        const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+
+        // 加权随机
+        let random = Math.random() * totalWeight;
+        for (let i = 0; i < events.length; i++) {
+            random -= weights[i];
+            if (random <= 0) {
+                return events[i];
+            }
+        }
+
+        return events[events.length - 1];
+    }
+
+    // 选择一个事件（整合所有筛选逻辑）
+    selectEvent(isNarrative) {
+        const ageGroup = GameConfig.getAgeGroup(this.character.age);
+        const allEvents = isNarrative ? GameEvents.narrativeEvents : GameEvents.choiceEvents;
+
+        // 第一步：按年龄段筛选
+        let candidates = this.filterEventsByAge(allEvents, ageGroup);
+
+        // 如果当前年龄段没有事件，尝试相邻年龄段
+        if (candidates.length === 0) {
+            console.warn(`年龄段 ${ageGroup} 没有${isNarrative ? '旁白' : '选择'}事件，尝试其他年龄段`);
+            candidates = allEvents;
+        }
+
+        // 第二步：去重筛选
+        candidates = this.filterEventsByDeduplication(candidates, isNarrative);
+
+        // 如果去重后没有候选事件，清空去重列表重新筛选
+        if (candidates.length === 0) {
+            console.warn(`去重后没有可用事件，清空去重列表`);
+            if (isNarrative) {
+                this.recentNarrativeEvents = [];
+            } else {
+                this.recentChoiceEvents = [];
+            }
+            candidates = this.filterEventsByAge(allEvents, ageGroup);
+            if (candidates.length === 0) candidates = allEvents;
+        }
+
+        // 第三步：加权随机选择
+        return this.selectEventByWeight(candidates);
+    }
+
+    // 记录事件到去重列表
+    recordEvent(eventId, isNarrative) {
+        if (isNarrative) {
+            this.recentNarrativeEvents.push(eventId);
+            if (this.recentNarrativeEvents.length > GameConfig.eventSystem.deduplication.narrativeEvents) {
+                this.recentNarrativeEvents.shift();
+            }
+        } else {
+            this.recentChoiceEvents.push(eventId);
+            if (this.recentChoiceEvents.length > GameConfig.eventSystem.deduplication.choiceEvents) {
+                this.recentChoiceEvents.shift();
+            }
+        }
+    }
+
+    // ============================================
+    // 事件触发（基于框架设计）
     // ============================================
 
     triggerRandomEvent() {
         if (!this.character.isAlive) return;
 
-        // TODO: 这里需要实现事件筛选逻辑
-        // 暂时显示占位信息
-        this.addMessage(`【${this.character.age}岁】`, 'system');
-        this.addMessage('事件系统待实现...', 'event');
+        // 判断是触发旁白事件还是选择事件
+        const narrativeChance = GameConfig.getNarrativeChance(this.character.age);
+        const isNarrative = Math.random() < narrativeChance;
 
-        // 临时：创建测试选项
-        this.showTestChoices();
-    }
-
-    // 临时测试方法
-    showTestChoices() {
-        this.clearChoices();
-
-        const choice1 = document.createElement('button');
-        choice1.className = 'choice-button';
-        choice1.textContent = '选择 A（存活）';
-        choice1.onclick = () => this.makeTestChoice(true);
-        this.choicesEl.appendChild(choice1);
-
-        const choice2 = document.createElement('button');
-        choice2.className = 'choice-button';
-        choice2.textContent = '选择 B（死亡）';
-        choice2.onclick = () => this.makeTestChoice(false);
-        this.choicesEl.appendChild(choice2);
-    }
-
-    makeTestChoice(survived) {
-        this.clearChoices();
-
-        if (survived) {
-            this.addMessage('你选择了 A，成功存活！', 'success');
-            this.addMessage(`▸ health +5`, 'success');
-            this.character.attributes.health += 5;
-
-            // 使用 config.js 的年龄跳跃规则
-            const ageJump = GameConfig.getAgeJump(this.character.age);
-            this.character.age += ageJump;
-            this.addMessage(`时间流逝... +${ageJump}岁`, 'system');
-            this.addMessage('', 'normal');
-
-            this.updateStats();
-
-            // 继续下一个事件
-            setTimeout(() => {
-                this.triggerRandomEvent();
-            }, 1500);
+        if (isNarrative) {
+            this.triggerNarrativeEvent();
         } else {
-            this.addMessage('你选择了 B，不幸死亡。', 'death');
-            this.addMessage('', 'death');
-            this.addMessage(`▸ 死因: 测试死亡`, 'death');
-            this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
-
-            this.character.isAlive = false;
-            this.endGame();
+            this.triggerChoiceEvent();
         }
     }
+
+    // ============================================
+    // 旁白事件处理
+    // ============================================
+
+    triggerNarrativeEvent() {
+        const event = this.selectEvent(true); // 选择旁白事件
+
+        if (!event) {
+            console.error('没有可用的旁白事件！');
+            this.triggerChoiceEvent(); // 降级到选择事件
+            return;
+        }
+
+        this.currentEvent = event;
+        this.recordEvent(event.id, true);
+
+        // 显示年龄(使用age样式)
+        this.addMessage('', 'normal');
+        this.addMessage(`【${this.character.age}岁】`, 'age');
+
+        // 显示事件文本
+        this.addMessage(event.text, 'event');
+        this.addMessage('', 'normal');
+
+        // 显示结果
+        if (event.result) {
+            this.addMessage(event.result, 'normal');
+            this.addMessage('', 'normal');
+        }
+
+        // 判断是否死亡
+        const isDead = Math.random() < event.death.chance;
+
+        if (isDead) {
+            this.handleNarrativeDeath(event);
+        } else {
+            this.handleNarrativeSurvival(event);
+        }
+    }
+
+    handleNarrativeDeath(event) {
+        this.character.isAlive = false;
+
+        this.addMessage('💀 你死了。', 'death');
+        this.addMessage(`▸ 死因: ${event.death.reason}`, 'death');
+        this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
+
+        this.endGame();
+    }
+
+    handleNarrativeSurvival(event) {
+        // 应用属性变化
+        if (event.attributes) {
+            this.applyAttributeChanges(event.attributes);
+        }
+
+        // 年龄跳跃
+        const ageJump = this.random(event.ageJump.min, event.ageJump.max);
+        this.character.age += ageJump;
+        this.addMessage(`时间流逝... +${ageJump}岁`, 'system');
+        this.addMessage('', 'normal');
+
+        this.updateStats();
+
+        // 检查是否自然死亡（年龄过大）
+        if (this.character.age >= 100) {
+            this.character.isAlive = false;
+            this.addMessage('💀 你寿终正寝了。', 'death');
+            this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
+            this.endGame();
+            return;
+        }
+
+        // 继续下一个事件
+        setTimeout(() => {
+            this.triggerRandomEvent();
+        }, 1500);
+    }
+
+    // ============================================
+    // 选择事件处理
+    // ============================================
+
+    triggerChoiceEvent() {
+        const event = this.selectEvent(false); // 选择选择事件
+
+        if (!event) {
+            console.error('没有可用的选择事件！');
+            this.handleGameOver('事件池耗尽');
+            return;
+        }
+
+        this.currentEvent = event;
+        this.recordEvent(event.id, false);
+
+        // 显示年龄(使用age样式)
+        this.addMessage('', 'normal');
+        this.addMessage(`【${this.character.age}岁】`, 'age');
+
+        // 显示事件描述
+        this.addMessage(event.event, 'event');
+        this.addMessage('', 'normal');
+
+        // 显示选项
+        this.showChoices(event);
+    }
+
+    showChoices(event) {
+        this.clearChoices();
+
+        event.choices.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.className = 'choice-button';
+            button.textContent = choice.text;
+            button.onclick = () => this.makeChoice(choice, event);
+            this.choicesEl.appendChild(button);
+        });
+    }
+
+    makeChoice(choice, event) {
+        this.clearChoices();
+
+        // 显示用户选择
+        this.addMessage(`▸ 你选择了: ${choice.text}`, 'system');
+        this.addMessage('', 'normal');
+
+        // 判断成功或失败
+        const isSuccess = Math.random() < choice.successRate;
+
+        if (isSuccess) {
+            this.handleChoiceSuccess(choice, event);
+        } else {
+            this.handleChoiceFailure(choice, event);
+        }
+    }
+
+    handleChoiceSuccess(choice, event) {
+        const success = choice.success;
+
+        // 显示结果
+        this.addMessage(success.result, 'success');
+        this.addMessage('', 'normal');
+
+        // 静默应用属性变化(不显示)
+        if (success.attributes) {
+            this.applyAttributeChangesSilent(success.attributes);
+        }
+
+        // 检查是否触发反转事件
+        const hasReversal = success.reversal && Math.random() < success.reversal.chance;
+
+        if (hasReversal) {
+            // 反转时显示属性变化
+            this.handleReversalEvent(success.reversal, event, success.attributes);
+        } else {
+            // 没有反转时才显示成功的属性变化
+            if (success.attributes) {
+                this.showAttributeChanges(success.attributes);
+            }
+            this.proceedAfterChoice(event);
+        }
+    }
+
+    handleChoiceFailure(choice, event) {
+        const failure = choice.failure;
+
+        // 显示结果
+        this.addMessage(failure.result, 'failure');
+        this.addMessage('', 'normal');
+
+        // 应用属性变化
+        if (failure.attributes) {
+            this.applyAttributeChanges(failure.attributes);
+        }
+
+        // 判断是否死亡
+        const isDead = Math.random() < failure.death.chance;
+
+        if (isDead) {
+            this.handleChoiceDeath(failure.death);
+        } else {
+            this.proceedAfterChoice(event);
+        }
+    }
+
+    handleChoiceDeath(death) {
+        this.character.isAlive = false;
+
+        this.addMessage('💀 你死了。', 'death');
+        this.addMessage(`▸ 死因: ${death.reason}`, 'death');
+        this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
+
+        this.endGame();
+    }
+
+    proceedAfterChoice(event) {
+        // 年龄跳跃
+        const ageJump = this.random(event.ageJump.min, event.ageJump.max);
+        this.character.age += ageJump;
+        this.addMessage(`时间流逝... +${ageJump}岁`, 'system');
+        this.addMessage('', 'normal');
+
+        this.updateStats();
+
+        // 检查是否自然死亡（年龄过大）
+        if (this.character.age >= 100) {
+            this.character.isAlive = false;
+            this.addMessage('💀 你寿终正寝了。', 'death');
+            this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
+            this.endGame();
+            return;
+        }
+
+        // 继续下一个事件
+        setTimeout(() => {
+            this.triggerRandomEvent();
+        }, 1500);
+    }
+
+    // ============================================
+    // 反转事件处理
+    // ============================================
+
+    handleReversalEvent(reversal, event, successAttributes) {
+        this.addMessage('', 'normal');
+
+        // 直接显示反转文本(移除"但是..."提示)
+        this.addMessage(reversal.text, 'failure');
+        this.addMessage('', 'normal');
+
+        // 先撤销成功的属性变化,再应用反转的属性变化
+        if (successAttributes) {
+            // 撤销成功的属性
+            for (const [attr, change] of Object.entries(successAttributes)) {
+                if (this.character.attributes[attr] !== undefined) {
+                    this.character.attributes[attr] = Math.max(-8888, Math.min(100, this.character.attributes[attr] - change));
+                }
+            }
+        }
+
+        // 应用反转的属性变化并显示
+        if (reversal.attributes) {
+            this.applyAttributeChanges(reversal.attributes);
+        }
+
+        // 判断是否死亡
+        const isDead = Math.random() < reversal.death.chance;
+
+        if (isDead) {
+            this.handleReversalDeath(reversal.death);
+        } else {
+            this.proceedAfterChoice(event);
+        }
+    }
+
+    handleReversalDeath(death) {
+        this.character.isAlive = false;
+
+        this.addMessage('💀 你死了。', 'death');
+        this.addMessage(`▸ 死因: ${death.reason}`, 'death');
+        this.addMessage(`▸ 享年: ${this.character.age}岁`, 'death');
+
+        this.endGame();
+    }
+
+    // ============================================
+    // 属性变化处理
+    // ============================================
+
+    // 应用属性变化并显示
+    applyAttributeChanges(attributes) {
+        for (const [attr, change] of Object.entries(attributes)) {
+            if (this.character.attributes[attr] !== undefined) {
+                const oldValue = this.character.attributes[attr];
+                this.character.attributes[attr] = Math.max(-8888, Math.min(100, oldValue + change));
+                const newValue = this.character.attributes[attr];
+
+                // 显示属性变化(使用中文名称)
+                const attrName = this.attrNameMap[attr] || attr;
+                const changeText = change > 0 ? `+${change}` : `${change}`;
+                const color = change > 0 ? 'success' : 'failure';
+                this.addMessage(`▸ ${attrName} ${changeText} (${oldValue} → ${newValue})`, color);
+            }
+        }
+    }
+
+    // 静默应用属性变化(不显示)
+    applyAttributeChangesSilent(attributes) {
+        for (const [attr, change] of Object.entries(attributes)) {
+            if (this.character.attributes[attr] !== undefined) {
+                this.character.attributes[attr] = Math.max(-8888, Math.min(100, this.character.attributes[attr] + change));
+            }
+        }
+    }
+
+    // 只显示属性变化(不应用)
+    showAttributeChanges(attributes) {
+        for (const [attr, change] of Object.entries(attributes)) {
+            if (this.character.attributes[attr] !== undefined) {
+                const currentValue = this.character.attributes[attr];
+                const oldValue = currentValue - change;  // 反推旧值
+
+                const attrName = this.attrNameMap[attr] || attr;
+                const changeText = change > 0 ? `+${change}` : `${change}`;
+                const color = change > 0 ? 'success' : 'failure';
+                this.addMessage(`▸ ${attrName} ${changeText} (${oldValue} → ${currentValue})`, color);
+            }
+        }
+    }
+
 
     // ============================================
     // 游戏结束
